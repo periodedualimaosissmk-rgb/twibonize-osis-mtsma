@@ -34,7 +34,7 @@
     }
 
     header h1 {
-      color: #16a34a; /* Warna hijau madrasah */
+      color: #16a34a; 
       font-size: 22px;
       margin-bottom: 5px;
       text-transform: uppercase;
@@ -81,7 +81,6 @@
       box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
     }
 
-    /* Highlight khusus untuk dropdown pemilihan peran */
     #input-peran {
       border: 2px solid #16a34a;
       font-weight: bold;
@@ -100,7 +99,7 @@
 
     .canvas-container {
       width: 100%;
-      aspect-ratio: 1 / 1;
+      /* aspect-ratio dihapus agar tinggi canvas menyesuaikan ukuran asli bingkai */
       border: 2px solid #cbd5e1;
       border-radius: 8px;
       overflow: hidden;
@@ -111,7 +110,7 @@
 
     canvas {
       width: 100%;
-      height: 100%;
+      height: auto; /* Memastikan gambar canvas menyesuaikan proporsi tanpa gepeng */
       cursor: grab;
       display: block;
     }
@@ -123,6 +122,7 @@
     .controls {
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 10px;
       margin-bottom: 20px;
     }
@@ -135,6 +135,27 @@
     input[type="range"] {
       flex: 1;
       cursor: pointer;
+    }
+
+    /* Gaya untuk tombol Plus & Minus Zoom */
+    .btn-zoom {
+      width: 35px;
+      height: 35px;
+      border: none;
+      border-radius: 6px;
+      background-color: #e2e8f0;
+      color: #333;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-zoom:hover {
+      background-color: #cbd5e1;
     }
 
     .caption-box {
@@ -167,44 +188,14 @@
       transform: scale(0.98);
     }
 
-    .btn-primary {
-      background-color: #16a34a;
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background-color: #15803d;
-    }
-
-    .btn-success {
-      background-color: #0284c7;
-      color: white;
-    }
-
-    .btn-success:hover {
-      background-color: #0369a1;
-    }
-
-    .btn-secondary {
-      background-color: #64748b;
-      color: white;
-      font-size: 14px;
-      padding: 8px;
-    }
-
-    .btn-secondary:hover {
-      background-color: #475569;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .hint {
-      font-size: 12px;
-      color: #64748b;
-      margin-bottom: 10px;
-    }
+    .btn-primary { background-color: #16a34a; color: white; }
+    .btn-primary:hover { background-color: #15803d; }
+    .btn-success { background-color: #0284c7; color: white; }
+    .btn-success:hover { background-color: #0369a1; }
+    .btn-secondary { background-color: #64748b; color: white; font-size: 14px; padding: 8px; }
+    .btn-secondary:hover { background-color: #475569; }
+    .hidden { display: none !important; }
+    .hint { font-size: 12px; color: #64748b; margin-bottom: 10px; }
   </style>
 </head>
 <body>
@@ -215,9 +206,9 @@
       <p>MTS MATHLA'UL ANWAR PUTAT</p>
     </header>
 
+    <!-- HALAMAN 1: FORM DATA DIRI & PILIH PERAN -->
     <div id="page-form">
       <div class="step-box">
-        
         <div class="form-group">
           <label for="input-peran">🌟 Pilih Peran Kamu:</label>
           <select id="input-peran">
@@ -238,12 +229,10 @@
             <label for="input-sekolah">Asal Sekolah</label>
             <input type="text" id="input-sekolah" placeholder="Contoh: SDN 1 Putat">
           </div>
-
           <div class="form-group">
             <label for="input-hobi">Hobi</label>
             <input type="text" id="input-hobi" placeholder="Contoh: Membaca, Sepak Bola">
           </div>
-
           <div class="form-group">
             <label for="input-cita">Cita - Cita</label>
             <input type="text" id="input-cita" placeholder="Contoh: Guru, Programmer, Dokter">
@@ -275,18 +264,23 @@
       <button id="btn-lanjut" class="btn-primary btn">Lanjut Selesaikan Twibbon ➔</button>
     </div>
 
+    <!-- HALAMAN 2: EDITOR TWIBBON -->
     <div id="page-editor" class="hidden">
       <div class="step-box">
         <h3 style="font-size: 16px; margin-bottom: 10px;">Atur Posisi Foto</h3>
-        <p class="hint">💡 Tip: Geser foto langsung di dalam kotak dan gunakan slider untuk zoom.</p>
+        <p class="hint">💡 Tip: Geser foto di dalam kotak dan gunakan tombol zoom (+/-).</p>
         
         <div class="canvas-container">
-          <canvas id="canvas" width="1080" height="1080"></canvas>
+          <!-- Canvas tidak lagi dikunci ukuran statis di HTML, melainkan mengikuti JS -->
+          <canvas id="canvas"></canvas>
         </div>
 
+        <!-- Pembaruan Kontrol Zoom dengan Tombol Minus & Plus -->
         <div class="controls">
           <label for="zoom-slider">Zoom:</label>
+          <button id="btn-zoom-out" class="btn-zoom">-</button>
           <input type="range" id="zoom-slider" min="0.1" max="3" step="0.05" value="1">
+          <button id="btn-zoom-in" class="btn-zoom">+</button>
         </div>
       </div>
 
@@ -303,7 +297,6 @@
   </div>
 
   <script type="module">
-    // 1. Mengambil Elemen HTML
     const pageForm = document.getElementById('page-form');
     const pageEditor = document.getElementById('page-editor');
     const btnLanjut = document.getElementById('btn-lanjut');
@@ -323,26 +316,24 @@
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const zoomSlider = document.getElementById('zoom-slider');
+    const btnZoomIn = document.getElementById('btn-zoom-in');
+    const btnZoomOut = document.getElementById('btn-zoom-out');
     const downloadBtn = document.getElementById('download-btn');
     const captionPreview = document.getElementById('caption-preview');
     const copyBtn = document.getElementById('copy-btn');
 
-    // 2. Variabel Gambar & State
     const frameImage = new Image();
     const userImage = new Image();
     let isUserImageLoaded = false;
-    let userX = canvas.width / 2;
-    let userY = canvas.height / 2;
+    let userX = 0;
+    let userY = 0;
     let userScale = 1;
     let isDragging = false;
     let startX, startY;
     let finalCaptionText = "";
 
-    // --- PENTING: KODE RAHASIA PANITIA ---
-    // Kamu bisa mengganti kata 'OSIS2026' di bawah ini dengan kode rahasia apa pun!
     const KODE_RAHASIA_PANITIA = "OSIS2026"; 
 
-    // 3. Fungsi Memuat Bingkai Sesuai Peran
     function loadFrameByRole() {
       if (inputPeran.value === 'PESERTA') {
         frameImage.src = 'media/frame-peserta.png';
@@ -352,18 +343,20 @@
     }
 
     loadFrameByRole();
-    frameImage.onload = () => draw();
+    
+    // PEMBARUAN: Memastikan ukuran Canvas secara otomatis mengikuti ukuran asli file frame
+    frameImage.onload = () => {
+      canvas.width = frameImage.width || 1080;
+      canvas.height = frameImage.height || 1080;
+      draw();
+    };
 
-    // 4. Logika Anti-Iseng saat Ganti Dropdown Peran
     inputPeran.addEventListener('change', () => {
       if (inputPeran.value === 'PANITIA') {
-        // Munculkan popup meminta kode rahasia
         const kodeInput = prompt("🔒 KODE RAHASIA OSIS/PANITIA:\nMasukkan kode rahasia untuk membuka akses panitia:");
-        
-        // Cek apakah kode benar
         if (kodeInput !== KODE_RAHASIA_PANITIA) {
           alert("❌ Kode Salah atau Dibatalkan!\nKamu dikembalikan ke form Peserta.");
-          inputPeran.value = 'PESERTA'; // Kembalikan ke peserta
+          inputPeran.value = 'PESERTA';
           formPesertaGroup.classList.remove('hidden');
           formPanitiaGroup.classList.add('hidden');
           loadFrameByRole();
@@ -374,71 +367,39 @@
           formPanitiaGroup.classList.remove('hidden');
         }
       } else {
-        // Jika kembali memilih Peserta
         formPesertaGroup.classList.remove('hidden');
         formPanitiaGroup.classList.add('hidden');
       }
-      
-      loadFrameByRole(); // Ganti bingkai otomatis
+      loadFrameByRole();
     });
 
-    // 5. Validasi & Navigasi ke Halaman Editor
     btnLanjut.addEventListener('click', () => {
       const peran = inputPeran.value;
-      
       if (!inputNama.value.trim() || !uploadInput.files[0]) {
         alert('Harap isi Nama Lengkap dan pilih Foto terlebih dahulu!');
         return;
       }
-
       if (peran === 'PESERTA') {
         if (!inputSekolah.value.trim() || !inputHobi.value.trim() || !inputCita.value.trim()) {
           alert('Harap lengkapi Asal Sekolah, Hobi, dan Cita-Cita kamu!');
           return;
         }
-
-        // CAPTION PESERTA
-        finalCaptionText = `🔊 I'M READY FOR MATAMUDA 2026
-
-Assalamu'alaikum warahmatullahi wabarakatuh
-👋🏻Hallo Sobat MTS MATHLA'UL ANWAR PUTAT!!! 
-Perkenalkan nama saya ${inputNama.value.trim()} , saya dari ${inputSekolah.value.trim()} , Hobi saya ${inputHobi.value.trim()} , Cita - Cita saya menjadi ${inputCita.value.trim()} 
-
-Saya siap menjadi bagian dari MTS MATHLA'UL ANWAR PUTAT Serta siap mengikuti seluruh rangkaian kegiatan Masa Ta'aruf Murid Madrasah (MATAMUDA) Tahun 2026/2027🌟
-
-#Mtsmathla'ulanwar#MATAMUDA2026
-#OSISmtsmathla'ulanwar#pesertamatamuda#twiboon`;
-
+        finalCaptionText = `🔊 I'M READY FOR MATAMUDA 2026\n\nAssalamu'alaikum warahmatullahi wabarakatuh\n👋🏻Hallo Sobat MTS MATHLA'UL ANWAR PUTAT!!! \nPerkenalkan nama saya ${inputNama.value.trim()} , saya dari ${inputSekolah.value.trim()} , Hobi saya ${inputHobi.value.trim()} , Cita - Cita saya menjadi ${inputCita.value.trim()} \n\nSaya siap menjadi bagian dari MTS MATHLA'UL ANWAR PUTAT Serta siap mengikuti seluruh rangkaian kegiatan Masa Ta'aruf Murid Madrasah (MATAMUDA) Tahun 2026/2027🌟\n\n#Mtsmathla'ulanwar#MATAMUDA2026\n#OSISmtsmathla'ulanwar#pesertamatamuda#twiboon`;
       } else {
-        // CAPTION PANITIA TERBARU
         const bagianOsis = inputBagianOsis.value;
-        finalCaptionText = `📢 PANITIA MATAMUDA | MTS MATHLA'UL ANWAR PUTAT 📢
-
-Assalamu'alaikum warahmatullahi wabarakatuh
-Halo, semua! 👋🏻 Saya ${inputNama.value.trim()}, dari osis bagian ${bagianOsis}. siap menyambut dan mendampingi perjalanan awal adik-adik di lingkungan sekolah yang baru ini, melalui Masa Ta'aruf Murid Madrasah (MATAMUDA) Mts Mathla'ul Anwar Putat Tahun Ajaran 2026/2027.
-
-Menjadi panitia MATAMUDA bukan hanya tentang menyambut siswa baru, tetapi juga tentang belajar bertanggung jawab, membangun solidaritas, dan menciptakan kesan pertama yang menyenangkan bagi mereka yang baru memulai perjalanan di MTS ini. 🤍💙
-
-See you at MATAMUDA 2026!
-
-----
-#mtsmathalulanwar#MATAMUDA2026
-#osismtsmathlaulanwar#panitiamatamuda#twiboon`;
+        finalCaptionText = `📢 PANITIA MATAMUDA | MTS MATHLA'UL ANWAR PUTAT 📢\n\nAssalamu'alaikum warahmatullahi wabarakatuh\nHalo, semua! 👋🏻 Saya ${inputNama.value.trim()}, dari osis bagian ${bagianOsis}. siap menyambut dan mendampingi perjalanan awal adik-adik di lingkungan sekolah yang baru ini, melalui Masa Ta'aruf Murid Madrasah (MATAMUDA) Mts Mathla'ul Anwar Putat Tahun Ajaran 2026/2027.\n\nMenjadi panitia MATAMUDA bukan hanya tentang menyambut siswa baru, tetapi juga tentang belajar bertanggung jawab, membangun solidaritas, dan menciptakan kesan pertama yang menyenangkan bagi mereka yang baru memulai perjalanan di MTS ini. 🤍💙\n\nSee you at MATAMUDA 2026!\n\n----\n#mtsmathalulanwar#MATAMUDA2026\n#osismtsmathlaulanwar#panitiamatamuda#twiboon`;
       }
-
       captionPreview.innerText = finalCaptionText;
       pageForm.classList.add('hidden');
       pageEditor.classList.remove('hidden');
       draw();
     });
 
-    // 6. Tombol Kembali
     btnKembali.addEventListener('click', () => {
       pageEditor.classList.add('hidden');
       pageForm.classList.remove('hidden');
     });
 
-    // 7. Logika Membaca File Gambar
     uploadInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
@@ -447,6 +408,8 @@ See you at MATAMUDA 2026!
           userImage.src = event.target.result;
           userImage.onload = () => {
             isUserImageLoaded = true;
+            
+            // Pusatkan gambar sesuai dengan lebar/tinggi dinamis canvas saat ini
             userX = canvas.width / 2;
             userY = canvas.height / 2;
             
@@ -464,7 +427,6 @@ See you at MATAMUDA 2026!
       }
     });
 
-    // 8. Render Canvas
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = "#ffffff";
@@ -483,9 +445,25 @@ See you at MATAMUDA 2026!
       }
     }
 
-    // 9. Kontrol Zoom & Drag
+    // PEMBARUAN: Logika Slider dan Tombol Zoom In & Out
     zoomSlider.addEventListener('input', (e) => {
       userScale = parseFloat(e.target.value);
+      draw();
+    });
+
+    btnZoomIn.addEventListener('click', () => {
+      let currentScale = parseFloat(zoomSlider.value);
+      let newScale = Math.min(parseFloat(zoomSlider.max), currentScale + 0.1);
+      zoomSlider.value = newScale;
+      userScale = newScale;
+      draw();
+    });
+
+    btnZoomOut.addEventListener('click', () => {
+      let currentScale = parseFloat(zoomSlider.value);
+      let newScale = Math.max(parseFloat(zoomSlider.min), currentScale - 0.1);
+      zoomSlider.value = newScale;
+      userScale = newScale;
       draw();
     });
 
@@ -533,7 +511,6 @@ See you at MATAMUDA 2026!
     canvas.addEventListener('touchmove', drag, { passive: false });
     canvas.addEventListener('touchend', stopDrag);
 
-    // 10. Tombol Download & Copy
     downloadBtn.addEventListener('click', () => {
       const dataURL = canvas.toDataURL('image/png');
       const link = document.createElement('a');
@@ -556,5 +533,4 @@ See you at MATAMUDA 2026!
     });
   </script>
 </body>
-  </html>
-  
+</html>
