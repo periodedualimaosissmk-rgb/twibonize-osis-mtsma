@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Twibbon & Caption MATAMUDA 2026 - MTs Mathla'ul Anwar</title>
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f0f4f8;
+      color: #333;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    header h1 {
+      color: #16a34a; /* Warna hijau madrasah */
+      font-size: 22px;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+
+    header p {
+      font-size: 14px;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .step-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #1e293b;
+    }
+
+    input[type="text"], select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+      background-color: #fff;
+    }
+
+    input[type="text"]:focus, select:focus {
+      outline: none;
+      border-color: #16a34a;
+      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+    }
+
+    /* Highlight khusus untuk dropdown pemilihan peran */
+    #input-peran {
+      border: 2px solid #16a34a;
+      font-weight: bold;
+      color: #15803d;
+      cursor: pointer;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      background: #fff;
+      border: 2px dashed #cbd5e1;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .canvas-container {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      overflow: hidden;
+      background-color: #e2e8f0;
+      position: relative;
+      margin-bottom: 15px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+      display: block;
+    }
+
+    canvas:active {
+      cursor: grabbing;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .controls label {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      cursor: pointer;
+    }
+
+    .caption-box {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      white-space: pre-wrap;
+      max-height: 160px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      color: #334155;
+      text-align: left;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-bottom: 10px;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background-color: #16a34a;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #15803d;
+    }
+
+    .btn-success {
+      background-color: #0284c7;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background-color: #0369a1;
+    }
+
+    .btn-secondary {
+      background-color: #64748b;
+      color: white;
+      font-size: 14px;
+      padding: 8px;
+    }
+
+    .btn-secondary:hover {
+      background-color: #475569;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>MATAMUDA 2026</h1>
+      <p>MTS MATHLA'UL ANWAR PUTAT</p>
+    </header>
+
+    <div id="page-form">
+      <div class="step-box">
+        
+        <div class="form-group">
+          <label for="input-peran">🌟 Pilih Peran Kamu:</label>
+          <select id="input-peran">
+            <option value="PESERTA">🎓 Saya Siswa Baru (Peserta MATAMUDA)</option>
+            <option value="PANITIA">📢 Saya OSIS / Panitia MATAMUDA</option>
+          </select>
+        </div>
+
+        <hr style="margin: 15px 0; border: none; border-top: 1px dashed #cbd5e1;">
+
+        <div class="form-group">
+          <label for="input-nama">Nama Lengkap</label>
+          <input type="text" id="input-nama" placeholder="Contoh: Ahmad Fauzi" required>
+        </div>
+
+        <div id="form-peserta-group">
+          <div class="form-group">
+            <label for="input-sekolah">Asal Sekolah</label>
+            <input type="text" id="input-sekolah" placeholder="Contoh: SDN 1 Putat">
+          </div>
+
+          <div class="form-group">
+            <label for="input-hobi">Hobi</label>
+            <input type="text" id="input-hobi" placeholder="Contoh: Membaca, Sepak Bola">
+          </div>
+
+          <div class="form-group">
+            <label for="input-cita">Cita - Cita</label>
+            <input type="text" id="input-cita" placeholder="Contoh: Guru, Programmer, Dokter">
+          </div>
+        </div>
+
+        <div id="form-panitia-group" class="hidden">
+          <div class="form-group">
+            <label for="input-bagian-osis">Bagian OSIS / Panitia</label>
+            <select id="input-bagian-osis">
+              <option value="Ketua OSIS">Ketua OSIS</option>
+              <option value="Wakil Ketua OSIS">Wakil Ketua OSIS</option>
+              <option value="Sekretaris">Sekretaris</option>
+              <option value="Bendahara">Bendahara</option>
+              <option value="Menteri Dalam Negeri">Menteri Dalam Negeri</option>
+              <option value="Menteri Luar Negeri">Menteri Luar Negeri</option>
+              <option value="Menteri Orsenbud">Menteri Orsenbud</option>
+              <option value="Menteri Agama">Menteri Agama</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="upload-input">Pilih Foto Terbaikmu</label>
+          <input type="file" id="upload-input" accept="image/*" required>
+        </div>
+      </div>
+
+      <button id="btn-lanjut" class="btn-primary btn">Lanjut Selesaikan Twibbon ➔</button>
+    </div>
+
+    <div id="page-editor" class="hidden">
+      <div class="step-box">
+        <h3 style="font-size: 16px; margin-bottom: 10px;">Atur Posisi Foto</h3>
+        <p class="hint">💡 Tip: Geser foto langsung di dalam kotak dan gunakan slider untuk zoom.</p>
+        
+        <div class="canvas-container">
+          <canvas id="canvas" width="1080" height="1080"></canvas>
+        </div>
+
+        <div class="controls">
+          <label for="zoom-slider">Zoom:</label>
+          <input type="range" id="zoom-slider" min="0.1" max="3" step="0.05" value="1">
+        </div>
+      </div>
+
+      <button id="download-btn" class="btn-primary btn">➔ Download Twibbon (PNG)</button>
+      
+      <div class="step-box" style="margin-top: 15px;">
+        <h3 style="font-size: 15px; margin-bottom: 8px;">Caption Media Sosial Kamu:</h3>
+        <div id="caption-preview" class="caption-box"></div>
+        <button id="copy-btn" class="btn-success btn">📋 Salin Teks Caption</button>
+      </div>
+
+      <button id="btn-kembali" class="btn-secondary btn">⬅ Kembali / Ubah Data</button>
+    </div>
+  </div>
+
+  <script type="module">
+    // 1. Mengambil Elemen HTML
+    const pageForm = document.getElementById('page-form');
+    const pageEditor = document.getElementById('page-editor');
+    const btnLanjut = document.getElementById('btn-lanjut');
+    const btnKembali = document.getElementById('btn-kembali');
+    
+    const inputPeran = document.getElementById('input-peran');
+    const formPesertaGroup = document.getElementById('form-peserta-group');
+    const formPanitiaGroup = document.getElementById('form-panitia-group');
+    
+    const inputNama = document.getElementById('input-nama');
+    const inputSekolah = document.getElementById('input-sekolah');
+    const inputHobi = document.getElementById('input-hobi');
+    const inputCita = document.getElementById('input-cita');
+    const inputBagianOsis = document.getElementById('input-bagian-osis');
+    const uploadInput = document.getElementById('upload-input');
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const zoomSlider = document.getElementById('zoom-slider');
+    const downloadBtn = document.getElementById('download-btn');
+    const captionPreview = document.getElementById('caption-preview');
+    const copyBtn = document.getElementById('copy-btn');
+
+    // 2. Variabel Gambar & State
+    const frameImage = new Image();
+    const userImage = new Image();
+    let isUserImageLoaded = false;
+    let userX = canvas.width / 2;
+    let userY = canvas.height / 2;
+    let userScale = 1;
+    let isDragging = false;
+    let startX, startY;
+    let finalCaptionText = "";
+
+    // --- PENTING: KODE RAHASIA PANITIA ---
+    // Kamu bisa mengganti kata 'OSIS2026' di bawah ini dengan kode rahasia apa pun!
+    const KODE_RAHASIA_PANITIA = "OSIS2026"; 
+
+    // 3. Fungsi Memuat Bingkai Sesuai Peran
+    function loadFrameByRole() {
+      if (inputPeran.value === 'PESERTA') {
+        frameImage.src = 'media/frame-peserta.png';
+      } else {
+        frameImage.src = 'media/frame-panitia.png';
+      }
+    }
+
+    loadFrameByRole();
+    frameImage.onload = () => draw();
+
+    // 4. Logika Anti-Iseng saat Ganti Dropdown Peran
+    inputPeran.addEventListener('change', () => {
+      if (inputPeran.value === 'PANITIA') {
+        // Munculkan popup meminta kode rahasia
+        const kodeInput = prompt("🔒 KODE RAHASIA OSIS/PANITIA:\nMasukkan kode rahasia untuk membuka akses panitia:");
+        
+        // Cek apakah kode benar
+        if (kodeInput !== KODE_RAHASIA_PANITIA) {
+          alert("❌ Kode Salah atau Dibatalkan!\nKamu dikembalikan ke form Peserta.");
+          inputPeran.value = 'PESERTA'; // Kembalikan ke peserta
+          formPesertaGroup.classList.remove('hidden');
+          formPanitiaGroup.classList.add('hidden');
+          loadFrameByRole();
+          return;
+        } else {
+          alert("✅ Kode Benar! Akses Panitia terbuka.");
+          formPesertaGroup.classList.add('hidden');
+          formPanitiaGroup.classList.remove('hidden');
+        }
+      } else {
+        // Jika kembali memilih Peserta
+        formPesertaGroup.classList.remove('hidden');
+        formPanitiaGroup.classList.add('hidden');
+      }
+      
+      loadFrameByRole(); // Ganti bingkai otomatis
+    });
+
+    // 5. Validasi & Navigasi ke Halaman Editor
+    btnLanjut.addEventListener('click', () => {
+      const peran = inputPeran.value;
+      
+      if (!inputNama.value.trim() || !uploadInput.files[0]) {
+        alert('Harap isi Nama Lengkap dan pilih Foto terlebih dahulu!');
+        return;
+      }
+
+      if (peran === 'PESERTA') {
+        if (!inputSekolah.value.trim() || !inputHobi.value.trim() || !inputCita.value.trim()) {
+          alert('Harap lengkapi Asal Sekolah, Hobi, dan Cita-Cita kamu!');
+          return;
+        }
+
+        // CAPTION PESERTA
+        finalCaptionText = `🔊 I'M READY FOR MATAMUDA 2026
+
+Assalamu'alaikum warahmatullahi wabarakatuh
+👋🏻Hallo Sobat MTS MATHLA'UL ANWAR PUTAT!!! 
+Perkenalkan nama saya ${inputNama.value.trim()} , saya dari ${inputSekolah.value.trim()} , Hobi saya ${inputHobi.value.trim()} , Cita - Cita saya menjadi ${inputCita.value.trim()} 
+
+Saya siap menjadi bagian dari MTS MATHLA'UL ANWAR PUTAT Serta siap mengikuti seluruh rangkaian kegiatan Masa Ta'aruf Murid Madrasah (MATAMUDA) Tahun 2026/2027🌟
+
+#Mtsmathla'ulanwar#MATAMUDA2026
+#OSISmtsmathla'ulanwar#pesertamatamuda#twiboon`;
+
+      } else {
+        // CAPTION PANITIA TERBARU
+        const bagianOsis = inputBagianOsis.value;
+        finalCaptionText = `📢 PANITIA MATAMUDA | MTS MATHLA'UL ANWAR PUTAT 📢
+
+Assalamu'alaikum warahmatullahi wabarakatuh
+Halo, semua! 👋🏻 Saya ${inputNama.value.trim()}, dari osis bagian ${bagianOsis}. siap menyambut dan mendampingi perjalanan awal adik-adik di lingkungan sekolah yang baru ini, melalui Masa Ta'aruf Murid Madrasah (MATAMUDA) Mts Mathla'ul Anwar Putat Tahun Ajaran 2026/2027.
+
+Menjadi panitia MATAMUDA bukan hanya tentang menyambut siswa baru, tetapi juga tentang belajar bertanggung jawab, membangun solidaritas, dan menciptakan kesan pertama yang menyenangkan bagi mereka yang baru memulai perjalanan di MTS ini. 🤍💙
+
+See you at MATAMUDA 2026!
+
+----
+#mtsmathalulanwar#MATAMUDA2026
+#osismtsmathlaulanwar#panitiamatamuda#twiboon`;
+      }
+
+      captionPreview.innerText = finalCaptionText;
+      pageForm.classList.add('hidden');
+      pageEditor.classList.remove('hidden');
+      draw();
+    });
+
+    // 6. Tombol Kembali
+    btnKembali.addEventListener('click', () => {
+      pageEditor.classList.add('hidden');
+      pageForm.classList.remove('hidden');
+    });
+
+    // 7. Logika Membaca File Gambar
+    uploadInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          userImage.src = event.target.result;
+          userImage.onload = () => {
+            isUserImageLoaded = true;
+            userX = canvas.width / 2;
+            userY = canvas.height / 2;
+            
+            const scaleWidth = canvas.width / userImage.width;
+            const scaleHeight = canvas.height / userImage.height;
+            userScale = Math.max(scaleWidth, scaleHeight);
+            
+            zoomSlider.min = Math.min(scaleWidth, scaleHeight) * 0.4;
+            zoomSlider.max = userScale * 3;
+            zoomSlider.value = userScale;
+            draw();
+          };
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // 8. Render Canvas
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      if (isUserImageLoaded) {
+        ctx.save();
+        ctx.translate(userX, userY);
+        ctx.scale(userScale, userScale);
+        ctx.drawImage(userImage, -userImage.width / 2, -userImage.height / 2);
+        ctx.restore();
+      }
+
+      if (frameImage.complete) {
+        ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    // 9. Kontrol Zoom & Drag
+    zoomSlider.addEventListener('input', (e) => {
+      userScale = parseFloat(e.target.value);
+      draw();
+    });
+
+    function getPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      if (e.touches && e.touches.length > 0) {
+        return {
+          x: (e.touches[0].clientX - rect.left) * scaleX,
+          y: (e.touches[0].clientY - rect.top) * scaleY
+        };
+      }
+      return {
+        x: (e.clientX - rect.left) * scaleX,
+        y: (e.clientY - rect.top) * scaleY
+      };
+    }
+
+    function startDrag(e) {
+      if (!isUserImageLoaded) return;
+      isDragging = true;
+      const pos = getPos(e);
+      startX = pos.x - userX;
+      startY = pos.y - userY;
+    }
+
+    function drag(e) {
+      if (!isDragging) return;
+      e.preventDefault();
+      const pos = getPos(e);
+      userX = pos.x - startX;
+      userY = pos.y - startY;
+      draw();
+    }
+
+    function stopDrag() { isDragging = false; }
+
+    canvas.addEventListener('mousedown', startDrag);
+    canvas.addEventListener('mousemove', drag);
+    canvas.addEventListener('mouseup', stopDrag);
+    canvas.addEventListener('mouseleave', stopDrag);
+
+    canvas.addEventListener('touchstart', startDrag, { passive: false });
+    canvas.addEventListener('touchmove', drag, { passive: false });
+    canvas.addEventListener('touchend', stopDrag);
+
+    // 10. Tombol Download & Copy
+    downloadBtn.addEventListener('click', () => {
+      const dataURL = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      const roleName = inputPeran.value === 'PESERTA' ? 'Peserta' : 'Panitia';
+      link.download = `Twibbon_MATAMUDA_${roleName}_${inputNama.value.replace(/\s+/g, '_')}.png`;
+      link.href = dataURL;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+
+    copyBtn.addEventListener('click', async () => {
+      if (!finalCaptionText) return;
+      try {
+        await navigator.clipboard.writeText(finalCaptionText);
+        alert('🎉 Sukses! Teks caption berhasil disalin ke clipboard HP/PC kamu!');
+      } catch (err) {
+        alert('Gagal menyalin teks otomatis, silakan blok dan salin manual teks di atas.');
+      }
+    });
+  </script>
+</body>
+  </html>
+  
